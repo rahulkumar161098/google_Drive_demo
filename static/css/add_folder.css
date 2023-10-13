@@ -1,0 +1,17 @@
+.section_header{
+   display: flex;
+   justify-content: space-between;
+}
+h4{
+   color: gray;
+}
+button{
+   color: white;
+   background-color: green;
+   border: none;
+   border-radius: 5px;
+   padding: 0px 10px;
+   cursor: pointer;
+   letter-spacing: 2px;
+   font-weight: 500;
+}

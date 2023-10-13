@@ -4,29 +4,60 @@ from django.contrib.auth.models import User
 from django.views import View
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .models import Folder
+from .models import Folder, Files
 # from .models import File, Folder, User
 
 # Create your views here.
 
 def home(request):
-   username = request.user.username
-   # print(username)
-   
+   if request.user.is_authenticated:
+      folder= Folder.objects.filter(folder_author=request.user)
+      context={
+         'folder': folder
+      }
+      print(folder)
+      return render(request, 'index.html', context)
+   # return HttpResponse('hello')
+   else:
+      return redirect('login')
+
+
+
+def upload_file(request, id):
+   if request.method == 'POST':
+      file= request.POST['file']
+      try:
+         create_folder= Files.objects.create(file=file, file_author=request.user, parent_folder=id )
+         create_folder.save()
+         return redirect('add_folder')
+      except:
+         messages.info(request, 'Something Went Wrong')
+         return render (request, 'index.html')  
+
+
+def create_folder(request):
    if request.method == 'POST':
       folder= request.POST['foldername']
       try:
-         create_folder= Folder.objects.create(name=folder, author=username)
-         if not Folder.objects.filter(name=request.POST['foldername']).exists():
-            create_folder.save()
-            return render (request, 'index.html')
-         else:
-            messages.info(request, 'Folder Name Already Taken')
+         create_folder= Folder.objects.create(folder_name=folder, folder_author=request.user)
+         create_folder.save()
+         # home()
+         return redirect('/home')
       except:
+         messages.info(request, 'Something Went Wrong')
          return render (request, 'index.html')  
-      return render(request, 'index.html')
-   return render(request, 'index.html')
-   # return HttpResponse('hello')
+
+def add_folder(request, id):
+   if request.method == 'POST':
+      file= request.POST['file']
+      try:
+         create_folder= Files.objects.create(file=file, file_author=request.user, parent_folder=id )
+         create_folder.save()
+         return redirect('add_folder')
+      except:
+         messages.info(request, 'Something Went Wrong')
+         return render (request, 'index.html') 
+   return render( request, 'add_folder.html')
 
 
 def user_login(request):
@@ -65,7 +96,7 @@ class RegisterView(View):
 
 def log_out(request):
    logout(request)
-   return redirect('user_login')
+   return redirect('login')
 
 
 # def all_parents(folder):

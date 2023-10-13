@@ -3,16 +3,19 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 class Folder(models.Model):
-   name = models.CharField(max_length=255)
-   parent_folder = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE)
-   author = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-  
-  # parents = models.OneToOneField('self', related_name="folders", on_delete=models.CASCADE)
+   folder_name = models.CharField(max_length=255)
+   folder_author = models.ForeignKey(User, on_delete=models.CASCADE,)
 
-   # def all_parents(self):
-   #    return self.parents
+   def __str__(self):
+      return self.folder_name
 
-   # def __str__(self):
-   #    return self.name
-   # def get_folders(self):
-   #    return "\n".join([p.folders for p in self.folders.all()])
+class Files(models.Model):
+   file_author= models.ForeignKey(User, on_delete=models.CASCADE)
+   file= models.FileField(upload_to='files')
+   parent_folder=models.CharField(max_length=10)
+
+
+class AddFolder(models.Model):
+   file_author= models.ForeignKey(User, on_delete=models.CASCADE)
+   parent_folder= models.ManyToManyField(to=Files)
+   name= models.FileField(upload_to='files')
